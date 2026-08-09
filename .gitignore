@@ -1,0 +1,10 @@
+# Ignore raw and processed datasets
+data/bronze/*
+data/silver/*
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+
+# Ignore environment credentials and Python cache
+venv/
+__pycache__/
+.env
