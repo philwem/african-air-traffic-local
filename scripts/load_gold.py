@@ -76,11 +76,11 @@ def load_silver_to_sql_server():
         ]
     ].copy()
 
-    # Explicitly map time_position_utc to DateTime type to prevent T-SQL legacy timestamp collision
+    # Explicitly map time_position_utc to DateTime and APPEND new records!
     fact_positions.to_sql(
         "FactFlightPositions",
         engine,
-        if_exists="replace",
+        if_exists="append",  # <-- CHANGE THIS FROM "replace" TO "append"
         index=False,
         dtype={"time_position_utc": SQLDateTime()}
     )
@@ -103,8 +103,11 @@ def load_silver_to_sql_server():
     sample = pd.read_sql_query(query, engine)
     print(sample.to_string(index=False))
 
-    print("\n[GOLD LOAD COMPLETE] SQL Server tables populated successfully!")
-
+   # Print cumulative total count
+    total_count = pd.read_sql_query(
+        "SELECT COUNT(*) AS total FROM FactFlightPositions", engine).iloc[0]['total']
+    print(
+        f"\n[SUCCESS] Total cumulative records in FactFlightPositions: {total_count}")
 
 if __name__ == "__main__":
     load_silver_to_sql_server()
